@@ -1,4 +1,5 @@
-from ABC import abstract
+#from ABC import abstract
+from abc import ABC, abstractmethod
 
 import datasets
 
@@ -12,8 +13,11 @@ class Extractor():
     See `../dataset.py`
     """
 
-    def __init__(
-            filename_col:str, ....) #Going to add stuff about files here
+    # def __init__(
+    #         filename_col:str, ....) #Going to add stuff about files here
+    def __init__(self):
+        """Initialize the Extractor"""
+        pass
 
     def forward() -> KnowledgeDataset:
         raise NotImplemented()

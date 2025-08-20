@@ -1,9 +1,9 @@
 # Example workflow
 
-from acoustic_knowledge_discovery import RNN_File_FP, EGCI_Chunk_FP, Cluster_Chunk_FP, CoralExtractor, D3Visualizer
+from acoustic_knowledge_discovery import RNN_File_FP, EGCI_Chunk_FP, Cluster_Chunk_FP, Extractor, D3Visualizer
 
 # Load some data
-extractor = CoralExtractor()
+extractor = Extractor()
 knowledge_ds = extractor("path to data")
 
 # Run the Pipeline

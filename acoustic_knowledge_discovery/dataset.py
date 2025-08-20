@@ -1,4 +1,4 @@
-from ABC import abstract
+from abc import ABC, abstractmethod
 
 import datasets
 
@@ -50,5 +50,5 @@ class KnowledgeDataset(datasets.DatasetDict):
             datasets.dataset: _description_
         """
 
-        TODO WRITE THIS
+        #TODO WRITE THIS
 
