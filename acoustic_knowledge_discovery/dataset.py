@@ -36,7 +36,7 @@ class KnowledgeDataset(datasets.DatasetDict):
     """
     def __init__(self, file_ds, anno_ds):
         self.file_ds = file_ds
-        self.anno_ds = self.anno_ds
+        self.anno_ds = anno_ds
         self.is_chunked = False
 
     def to_graph_format() -> GraphDataset:
