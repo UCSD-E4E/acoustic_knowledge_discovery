@@ -14,7 +14,7 @@ knowledge_ds = Cluster_Chunk_FP(knowledge_ds)
 # Collect the results
 graph_ds_format = knowledge_ds.to_graph_format()
 
-vis = DS3Visualizer(Output_path = "KDSFJLKSD")
+vis = D3Visualizer(Output_path = "KDSFJLKSD")
 vis(graph_ds_format) #Outputs all artificats for running the D3 visualizers
 # Does this have interaction with python? Is this part of the process?
 # Idk? This may need more thoughts

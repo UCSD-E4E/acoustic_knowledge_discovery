@@ -24,6 +24,8 @@ class FeaturePreprocessor():
 
         Returns 
             KnowledgeDataset: The same dataset but with a new feature on top of it!
-            The input should be a subset of the output
+            The input SHOULD be a subset of the output
+
+            Chunking is the ONLY exception
         """
         raise NotImplemented()

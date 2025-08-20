@@ -8,7 +8,8 @@ class GraphDataset():
 
         Output of feature pipeline
     """
-    pass
+    def __init__(ds, feature_cols=[]):
+        raise NotImplementedError()
 
 
 
@@ -24,6 +25,7 @@ class KnowledgeDataset(datasets.DatasetDict):
             - file_path
             - offset_time
             - end_time
+            - ID: `{file_path}_{offset}`
 
         has_property
             - label_cols
@@ -35,12 +37,13 @@ class KnowledgeDataset(datasets.DatasetDict):
     def __init__(self, file_ds, anno_ds):
         self.file_ds = file_ds
         self.anno_ds = self.anno_ds
+        self.is_chunked = False
 
     def to_graph_format() -> GraphDataset:
         """Get the format for visualization
 
         1 dataset that contains rows formatted as 
-        file_path, offset, end_time, feat1, feat2, ....
+        id, file_path, offset, end_time, feat1, feat2, ....
 
         This does not need to be overwritten
         Returns:
