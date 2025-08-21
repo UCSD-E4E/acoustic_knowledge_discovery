@@ -1,4 +1,7 @@
 from ..dataset import KnowledgeDataset
+from collections.abc import Callable
+from typing import Union, Any
+from pathlib import Path
 
 class FeaturePreprocessor():
     """Gets feature for the knowledge graph
@@ -7,8 +10,14 @@ class FeaturePreprocessor():
         Augments anno_ds -> FeatureName_Chunk_FP
         Augments file_ds -> FeatureName_File_FP
     """
-    def __init__(self):
-        pass
+    def __init__(self,
+                template_fn: Callable[[
+                        Union[str, Path], 
+                        Union[str, Path], 
+                        Union[str, Path], 
+                        float], 
+                    Any],):
+        self.template_fn = template_fn
 
     def __call__(self, knowledge_ds: KnowledgeDataset) -> KnowledgeDataset:
         """Adds to the KnowledgeDataset, either at a file level or a chunk level
@@ -28,4 +37,6 @@ class FeaturePreprocessor():
 
             Chunking is the ONLY exception
         """
+        anno_csv = knowledge_ds.anno_ds
+
         raise NotImplemented()

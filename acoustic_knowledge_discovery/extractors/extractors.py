@@ -1,7 +1,7 @@
 #from ABC import abstract
 from abc import ABC, abstractmethod
 from ..dataset import KnowledgeDataset
-from datasets import load_dataset
+from datasets import load_dataset, Features, Value
 from pathlib import Path
 from typing import Union
 
@@ -37,19 +37,33 @@ class Extractor():
         except Exception as e:
             raise ValueError(f"annos_csv {annos_csv} produced error: {e}")
         
+        #add ID column to annotations
+        def _make_id(example):
+            example["ID"] = f"{example['file_path']}_{example['offset_time']}"
+            return example
+        self.anno_ds = self.anno_ds.map(_make_id)
+        
+        
         #validate that the files and annotations have the required columns
         if "file_path" not in self.file_ds.column_names:
             raise ValueError("files_csv must contain a 'file_path' column")
-        required_cols = {"file_path", "offset_time", "end_time"}
+        required_cols = {"file_path", "offset_time", "annotation", "end_time", "confidence"} #end_time is when annotation ends
         missing = required_cols - set(self.anno_ds.column_names)
         if missing:
             raise ValueError(f"annotations_csv missing required column(s): {missing}")
 
-        # #add ID column to annotations
-        # def _make_id(example):
-        #     example["ID"] = f"{example['file_path']}_{example['offset_time']}"
-        #     return example
-        # self.anno_ds = self.anno_ds.map(_make_id)
+
+        #force the type of all columns in file_ds to avoid mismatch errors later
+        for curr_col in self.file_ds.column_names: #string is the most extensible type
+            self.file_ds = self.file_ds.cast_column(curr_col, Value(dtype='string'))
+        #force the type of all columns in anno_ds to avoid mismatch errors later
+        float_cols = {"offset_time", "end_time", "confidence"}
+        for curr_col in float_cols:
+            self.anno_ds = self.anno_ds.cast_column(curr_col, Value(dtype='float64'))
+        non_float_cols= set(self.anno_ds.column_names) - float_cols
+        for curr_col in non_float_cols:
+            self.anno_ds = self.anno_ds.cast_column(curr_col, Value(dtype='string'))
+       
 
         print("columns in file_ds:", self.file_ds.column_names)
         print("columns in anno_ds:", self.anno_ds.column_names)
