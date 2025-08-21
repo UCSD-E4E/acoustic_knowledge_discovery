@@ -1,24 +1,25 @@
 from ..dataset import KnowledgeDataset
-from collections.abc import Callable
-from typing import Union, Any
-from pathlib import Path
+from abc import ABC, abstractmethod
+import torch.nn as nn
 
-class FeaturePreprocessor():
+class FeaturePreprocessor(nn.Module):
+    """Base class for feature preprocessors in the knowledge discovery pipeline."""
+    
     """Gets feature for the knowledge graph
     
     Perfered Naming Convention: (open to feed back)
         Augments anno_ds -> FeatureName_Chunk_FP
         Augments file_ds -> FeatureName_File_FP
     """
-    def __init__(self,
-                template_fn: Callable[[
-                        Union[str, Path], 
-                        Union[str, Path], 
-                        Union[str, Path], 
-                        float], 
-                    Any],):
-        self.template_fn = template_fn
+    def __init__(self, name: str = ""):
+        self.name = name or self.__class__.__name__
 
+    @abstractmethod
+    def forward(self, kd: KnowledgeDataset) -> KnowledgeDataset:
+        """Transform and return a KnowledgeDataset."""
+        ...
+        
+    @abstractmethod
     def __call__(self, knowledge_ds: KnowledgeDataset) -> KnowledgeDataset:
         """Adds to the KnowledgeDataset, either at a file level or a chunk level
         
@@ -37,6 +38,4 @@ class FeaturePreprocessor():
 
             Chunking is the ONLY exception
         """
-        anno_csv = knowledge_ds.anno_ds
-
-        raise NotImplemented()
+        return self.forward(knowledge_ds)

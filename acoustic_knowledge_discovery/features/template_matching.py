@@ -9,6 +9,8 @@ from scipy import signal
 from datetime import datetime
 from pydub import AudioSegment
 from datasets import concatenate_datasets, Dataset
+from ..dataset import KnowledgeDataset
+from pathlib import Path
 
 
 # Computes mel spectrogram from an audio signal
@@ -81,14 +83,16 @@ def get_species_name(filename):
 
 
 class TemplateMatching(FeaturePreprocessor):
-    def __init__(self, CLIP_PATH, TEMPLATE_PATH, THRESHOLD, anno_ds):
+    def __init__(self, CLIP_PATH: str | Path, TEMPLATE_PATH: str | Path, THRESHOLD: float):
         super().__init__("TemplateMatching")
         self.CLIP_PATH = CLIP_PATH
         self.TEMPLATE_PATH = TEMPLATE_PATH
-        self.anno_ds=anno_ds
+        # self.anno_ds=kd.anno_ds
+        # self.kd=kd
         self.THRESHOLD = THRESHOLD
 
-    def __call__(self):
+    def __call__(self, kd: KnowledgeDataset) -> KnowledgeDataset:
+        anno_ds = kd.anno_ds
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         # # Initialize CSV file for storing all detection results
         # with open(self.CSV_OUTPUT_FILE, 'a', newline='') as csvfile: #ensures you start on next line 
@@ -226,9 +230,12 @@ class TemplateMatching(FeaturePreprocessor):
                 print(f"Progress: {template_count}/{len(selected_templates)} templates completed ({progress_percent:.1f}%)")
 
         # Print final summary to console
-        new_ds = Dataset.from_dict(new_rows)
-        ds_updated = concatenate_datasets([self.anno_ds, new_ds])
+        if len(next(iter(new_rows.values()), [])) > 0:
+            appended_anno_ds = Dataset.from_dict(new_rows)
+            anno_ds_updated = concatenate_datasets([anno_ds, appended_anno_ds])
+        else:
+            anno_ds_updated = anno_ds  # nothing to append
         #print(f"Template matching completed. CSV matches saved to {self.CSV_OUTPUT_FILE}")
         print(f"Total matches found above the threshold of {self.THRESHOLD}: {total_matches_count}")
-        #returns anno_ds with template matching results appended
-        return ds_updated
+        #returns new knowledgedataset where anno_ds has template matching results appended
+        return KnowledgeDataset(file_ds=kd.file_ds, anno_ds=anno_ds_updated)
