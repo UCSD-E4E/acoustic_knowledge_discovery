@@ -11,68 +11,10 @@ from pydub import AudioSegment
 from datasets import concatenate_datasets, Dataset
 from ..dataset import KnowledgeDataset
 from pathlib import Path
+from ..utils import compute_mel_spectrogram, spectrogram_to_image, find_dominant_frequency_range, filter_spectrogram_by_frequency_range, fast_audio_load
 
-
-# Computes mel spectrogram from an audio signal
-
-def compute_mel_spectrogram(y, sr, n_mels=128, hop_length=512):
-    S = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels, hop_length=hop_length)
-    S_dB = librosa.power_to_db(S, ref=np.max)
-    return S_dB
-
-# Converts a mel spectrogram in dB to an image format suitable for use in template matching or visualization
-
-def spectrogram_to_image(S_dB):
-    img = (S_dB - S_dB.min()) / (S_dB.max() - S_dB.min())
-    img = (img * 255).astype(np.uint8)
-    return img
-
-# Finds the dominant frequency range in a mel spectrogram based on the energy distribution
-# Returns the mel bin indices that contain most of the energy
-
-def find_dominant_frequency_range(spectrogram, energy_threshold=0.1):
-    freq_energy = np.mean(spectrogram, axis=1)
-    freq_energy = (freq_energy - freq_energy.min()) / (freq_energy.max() - freq_energy.min())
-    
-    dominant_bins = np.where(freq_energy > energy_threshold)[0]
-    
-    if len(dominant_bins) == 0:
-        return 0, spectrogram.shape[0]
-
-    return dominant_bins.min(), dominant_bins.max() + 1
-
-# Extract a specific frequency range from the spectrogram to focus matching on relevant frequencies
-
-def filter_spectrogram_by_frequency_range(spectrogram, freq_min, freq_max):
-    return spectrogram[freq_min:freq_max, :]
-
-# Efficiently load audio files with decimation to improve time
-
-def fast_audio_load(audio_path, target_sr=22050):
-    y, original_sr = sf.read(audio_path)
-    
-    if y.ndim > 1:
-        y = y[:, 0]
-    
-    if original_sr != target_sr:
-        decimation = original_sr // target_sr
-        if decimation > 1 and len(y) > 100:
-            try:
-                y = signal.decimate(y, decimation)
-                sr = original_sr // decimation
-            except ValueError:
-                y = librosa.resample(y, orig_sr=original_sr, target_sr=target_sr)
-                sr = target_sr
-        else:
-            y = librosa.resample(y, orig_sr=original_sr, target_sr=target_sr)
-            sr = target_sr
-    else:
-        sr = target_sr
-    
-    return y, sr
 
 # Get species name from xeno-canto filename format
-
 def get_species_name(filename):
     base_name = filename.replace('.mp3', '').replace('.MP3', '').replace('.wav', '').replace('.WAV', '')
     parts = base_name.split('_')
@@ -151,7 +93,10 @@ class TemplateMatching(FeaturePreprocessor):
                 # Track results for summary statistics
                 clip_names = []
                 match_counts = []
-                
+
+                audioTemplate = AudioSegment.from_file(template_path)
+                lenOfTemplate = len(audioTemplate) / 1000 
+
                 # Process each audio clip in the clips directory
                 for clip in os.listdir(self.CLIP_PATH):
                     if clip.lower().endswith('.wav'):
@@ -159,7 +104,7 @@ class TemplateMatching(FeaturePreprocessor):
                         clip_path = os.path.join(self.CLIP_PATH, clip)
                         
                         try:
-                            y_clip, sr_clip = fast_audio_load(clip_path, target_sr=22050)
+                            y_clip, sr_clip, duration_clip_seconds = fast_audio_load(clip_path, target_sr=22050)
                             #f.write(f"Loaded clip: {clip} (duration: {len(y_clip)/sr_clip:.1f}s)\n")
                         except Exception as exception:
                             print(f"ERROR: Failed to load {clip}: {str(exception)}\n")
@@ -205,14 +150,10 @@ class TemplateMatching(FeaturePreprocessor):
                         #csv_writer = csv.writer(csvfile)
                         for y, x, score in selected:
                             timestamp_match = x * seconds_per_col
-                            audioTemplate = AudioSegment.from_file(template_path)
-                            lenOfTemplate = len(audioTemplate) / 1000 
 
-                            audioClip = AudioSegment.from_file(clip_path)
-                            lenOfClip= len(audioClip) / 1000 
                             new_rows["file_path"].append(clip)
                             new_rows["offset_time"].append(float(timestamp_match))
-                            new_rows["end_time"].append(float(min(timestamp_match + lenOfTemplate, lenOfClip)))
+                            new_rows["end_time"].append(float(min(timestamp_match + lenOfTemplate, duration_clip_seconds)))
                             new_rows["annotation"].append(template_name_clean)
                             new_rows["confidence"].append(float(score))
                             new_rows["ID"].append(f"{clip}_{timestamp_match}")
