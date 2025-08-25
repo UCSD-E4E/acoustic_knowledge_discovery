@@ -1,3 +1,3 @@
 from .dataset import GraphDataset, ChunkDataset
-from .features import FeaturePreprocessor
+from .features_file_level import FeaturePreprocessor
 from .utils import utils

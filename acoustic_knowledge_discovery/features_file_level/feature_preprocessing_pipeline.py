@@ -1,5 +1,5 @@
 from torch import nn
-from ..dataset import KnowledgeDataset
+from ..dataset import ChunkDataset
 from .feature_preprocessor import FeaturePreprocessor
 
 class FeatureSequential(nn.Module):
@@ -11,7 +11,7 @@ class FeatureSequential(nn.Module):
         for idx, step in enumerate(steps):
             self.add_module(str(idx), step)
 
-    def forward(self, kd: KnowledgeDataset) -> KnowledgeDataset:
+    def forward(self, kd: ChunkDataset) -> ChunkDataset:
         for name, step in self._modules.items():
             if not isinstance(step, FeaturePreprocessor):
                 raise TypeError(f"Step {name} is not inheriting from FeaturePreprocessor")

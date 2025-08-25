@@ -1,6 +1,6 @@
 #from ABC import abstract
 from abc import ABC, abstractmethod
-from ..dataset import KnowledgeDataset, ChunkDataset
+from ..dataset import ChunkDataset
 from datasets import Dataset, DatasetDict, Sequence, Value
 from pathlib import Path
 from typing import Union
@@ -162,6 +162,6 @@ class Extractor():
         self.chunk_ds = DatasetDict({"train": train_ds.cast(feats)})
 
 
-    def forward(self) -> KnowledgeDataset:
-        """Run the extractor and return a KnowledgeDataset"""
+    def forward(self) -> ChunkDataset:
+        """Run the extractor and return a ChunkDataset"""
         return ChunkDataset(self.chunk_ds)

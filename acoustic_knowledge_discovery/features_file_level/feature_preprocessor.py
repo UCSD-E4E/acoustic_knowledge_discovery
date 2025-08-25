@@ -1,4 +1,4 @@
-from ..dataset import KnowledgeDataset
+from ..dataset import ChunkDataset
 from abc import ABC, abstractmethod
 import torch.nn as nn
 
@@ -15,12 +15,12 @@ class FeaturePreprocessor(nn.Module):
         self.name = name or self.__class__.__name__
 
     @abstractmethod
-    def forward(self, kd: KnowledgeDataset) -> KnowledgeDataset:
+    def forward(self, kd: ChunkDataset) -> ChunkDataset:
         """Transform and return a KnowledgeDataset."""
         ...
         
     @abstractmethod
-    def __call__(self, knowledge_ds: KnowledgeDataset) -> KnowledgeDataset:
+    def __call__(self, knowledge_ds: ChunkDataset) -> ChunkDataset:
         """Adds to the KnowledgeDataset, either at a file level or a chunk level
         
         For The Young Devs
