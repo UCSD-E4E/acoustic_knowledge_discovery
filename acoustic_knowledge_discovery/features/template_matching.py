@@ -3,15 +3,11 @@ import librosa
 import numpy as np
 import cv2 as cv
 import os
-import csv
-import soundfile as sf
-from scipy import signal
 from datetime import datetime
 from pydub import AudioSegment
-from datasets import concatenate_datasets, Dataset
-from ..dataset import KnowledgeDataset
+from ..dataset import ChunkDataset
 from pathlib import Path
-from ..utils import compute_mel_spectrogram, spectrogram_to_image, find_dominant_frequency_range, filter_spectrogram_by_frequency_range, fast_audio_load
+from ..utils import compute_mel_spectrogram, spectrogram_to_image, find_dominant_frequency_range, filter_spectrogram_by_frequency_range, fast_audio_load, insert_annotation_ds
 
 
 # Get species name from xeno-canto filename format
@@ -25,30 +21,15 @@ def get_species_name(filename):
 
 
 class TemplateMatching(FeaturePreprocessor):
-    def __init__(self, CLIP_PATH: str | Path, TEMPLATE_PATH: str | Path, THRESHOLD: float):
+    def __init__(self, CLIP_PATH: str | Path, TEMPLATE_PATH: str | Path, THRESHOLD: float, chunk_size: int = 5):
         super().__init__("TemplateMatching")
         self.CLIP_PATH = CLIP_PATH
         self.TEMPLATE_PATH = TEMPLATE_PATH
-        # self.anno_ds=kd.anno_ds
-        # self.kd=kd
         self.THRESHOLD = THRESHOLD
+        self.chunk_size= chunk_size
 
-    def __call__(self, kd: KnowledgeDataset) -> KnowledgeDataset:
-        anno_ds = kd.anno_ds
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        # # Initialize CSV file for storing all detection results
-        # with open(self.CSV_OUTPUT_FILE, 'a', newline='') as csvfile: #ensures you start on next line 
-        #     csv_writer = csv.writer(csvfile)
-        #     #csv_writer.writerow(['template_name', 'clip_name', 'timestamp', 'score'])
-
-        new_rows = {
-            "file_path":[],
-            "offset_time":[],
-            "end_time": [],
-            "annotation": [],
-            "confidence": [],
-            "ID": []
-        }
+    def __call__(self, chunkDS: ChunkDataset) -> ChunkDataset:
+        chunk_ds = chunkDS.chunk_ds
 
         total_matches_count = 0
 
@@ -151,12 +132,14 @@ class TemplateMatching(FeaturePreprocessor):
                         for y, x, score in selected:
                             timestamp_match = x * seconds_per_col
 
-                            new_rows["file_path"].append(clip)
-                            new_rows["offset_time"].append(float(timestamp_match))
-                            new_rows["end_time"].append(float(min(timestamp_match + lenOfTemplate, duration_clip_seconds)))
-                            new_rows["annotation"].append(template_name_clean)
-                            new_rows["confidence"].append(float(score))
-                            new_rows["ID"].append(f"{clip}_{timestamp_match}")
+                            chunk_ds["train"] = insert_annotation_ds(chunk_ds["train"], 
+                                                                     file_name=clip, 
+                                                                     anno_start=float(timestamp_match), 
+                                                                     anno_end = float(min(timestamp_match + lenOfTemplate, duration_clip_seconds)), 
+                                                                     annotation = template_name_clean , 
+                                                                     confidence = float(score),
+                                                                     chunk_size=self.chunk_size
+                                                                    )
                                 
                             #csv_writer.writerow([clip,timestamp_match, min(timestamp_match + lenOfTemplate, lenOfClip), template_name_clean,  score])
                         
@@ -170,13 +153,8 @@ class TemplateMatching(FeaturePreprocessor):
                 progress_percent = (template_count / len(selected_templates)) * 100
                 print(f"Progress: {template_count}/{len(selected_templates)} templates completed ({progress_percent:.1f}%)")
 
-        # Print final summary to console
-        if len(next(iter(new_rows.values()), [])) > 0:
-            appended_anno_ds = Dataset.from_dict(new_rows)
-            anno_ds_updated = concatenate_datasets([anno_ds, appended_anno_ds])
-        else:
-            anno_ds_updated = anno_ds  # nothing to append
+        
         #print(f"Template matching completed. CSV matches saved to {self.CSV_OUTPUT_FILE}")
         print(f"Total matches found above the threshold of {self.THRESHOLD}: {total_matches_count}")
-        #returns new knowledgedataset where anno_ds has template matching results appended
-        return KnowledgeDataset(file_ds=kd.file_ds, anno_ds=anno_ds_updated)
+        #returns new chunkdataset where chunk_ds has template matching results appended
+        return ChunkDataset(chunk_ds=chunk_ds)

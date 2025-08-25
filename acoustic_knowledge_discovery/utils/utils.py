@@ -61,3 +61,15 @@ def fast_audio_load(audio_path, target_sr=22050):
     num_samples = len(y)
     duration_seconds = num_samples / sr
     return y, sr, duration_seconds
+
+
+def insert_annotation_ds(ds, file_name, anno_start, anno_end, annotation, confidence, chunk_size):
+    def add_hit(row):
+        if (row["file_name"] == file_name 
+            and (row["chunk_start"] + chunk_size) > anno_start 
+            and row["chunk_start"] < anno_end):
+            row["Annotation"] = row.get("Annotation", []) + [annotation]
+            row["Confidence"] = row.get("Confidence", []) + [float(confidence)]
+        return row
+    
+    return ds.map(add_hit)
