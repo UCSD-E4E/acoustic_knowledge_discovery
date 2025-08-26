@@ -1,16 +1,26 @@
-from ..dataset import KnowledgeDataset
+from ..dataset import ChunkDataset
+from abc import ABC, abstractmethod
+import torch.nn as nn
 
-class FeaturePreprocessor():
+class FeaturePreprocessor(nn.Module):
+    """Base class for feature preprocessors in the knowledge discovery pipeline."""
+    
     """Gets feature for the knowledge graph
     
     Perfered Naming Convention: (open to feed back)
         Augments anno_ds -> FeatureName_Chunk_FP
         Augments file_ds -> FeatureName_File_FP
     """
-    def __init__(self):
-        pass
+    def __init__(self, name: str = ""):
+        self.name = name or self.__class__.__name__
 
-    def __call__(self, knowledge_ds: KnowledgeDataset) -> KnowledgeDataset:
+    @abstractmethod
+    def forward(self, kd: ChunkDataset) -> ChunkDataset:
+        """Transform and return a KnowledgeDataset."""
+        ...
+        
+    @abstractmethod
+    def __call__(self, knowledge_ds: ChunkDataset) -> ChunkDataset:
         """Adds to the KnowledgeDataset, either at a file level or a chunk level
         
         For The Young Devs
@@ -28,4 +38,4 @@ class FeaturePreprocessor():
 
             Chunking is the ONLY exception
         """
-        raise NotImplemented()
+        return self.forward(knowledge_ds)
