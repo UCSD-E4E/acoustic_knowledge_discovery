@@ -102,11 +102,10 @@ class Extractor():
                 if start < duration:
                     starts.append(start)
 
-            file_stem = os.path.splitext(os.path.basename(str(row["file_name"])))[0]
             for start in starts:
                 rec = {k: row[k] for k in keep_cols} #insert the columns to keep from the files_csv
                 rec["chunk_start"] = start
-                rec["chunk_id"] = f"{file_stem}_{start}"
+                rec["chunk_id"] = f"{str(row["file_name"])}_{start}"
                 rec["Annotation"] = []
                 rec["Confidence"] = []
                 chunk_rows.append(rec)

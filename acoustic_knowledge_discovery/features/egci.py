@@ -1,4 +1,4 @@
-from ..dataset import KnowledgeDataset
+from ..dataset import ChunkDataset
 
 import numpy as np
 from scipy.linalg import toeplitz
@@ -91,10 +91,11 @@ class EGCI():
     
     """
     def __init__(self, nlag=512):
+        print("EGCI __init__")
         self.nlag = nlag
         
 
-    def __call__(self, knowledge_ds: KnowledgeDataset) -> KnowledgeDataset:
+    def __call__(self, chunkDS: ChunkDataset) -> ChunkDataset:
         """
         Parameters
         ----------
@@ -104,13 +105,14 @@ class EGCI():
         -------
             KnowledgeDataset: _the same dataset but with EGCI column_ `tuple(entropy, complexity)`
         """
-        anno_ds = knowledge_ds.anno_ds
+        chunk_ds = chunkDS.chunk_ds
+        print("EGCI __call__")
         
         #TODO ADD raw_audio COLUMN TO anno_ds containing audio from that split
         
-        anno_ds_processed = anno_ds.map(process_batch, fn_kwargs={"lag": self.nlag}, batched=True, num_processes=4)
+        chunk_ds_processed = chunk_ds.map(process_batch, fn_kwargs={"lag": self.nlag}, batched=True, num_proc=4)
         
-        return anno_ds_processed
+        return ChunkDataset(chunk_ds=chunk_ds_processed)
     
         
         

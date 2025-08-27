@@ -1,4 +1,4 @@
-from ..dataset import KnowledgeDataset
+from ..dataset import ChunkDataset
 import torch
 from models import AutoEncoder
 
@@ -53,7 +53,7 @@ class autoencode():
         
         
 
-    def __call__(self, knowledge_ds: KnowledgeDataset) -> KnowledgeDataset:
+    def __call__(self, chunkDS: ChunkDataset) -> ChunkDataset:
         """
         Parameters
         ----------
@@ -63,11 +63,11 @@ class autoencode():
         -------
             KnowledgeDataset: _the same dataset but with EGCI column_ `tuple(entropy, complexity)`
         """
-        anno_ds = knowledge_ds.anno_ds
-        anno_ds.set_transform(MelSpectrogramPreprocessor)
+        chunk_ds = chunkDS.chunk_ds
+        chunk_ds.set_transform(MelSpectrogramPreprocessor)
         
         #TODO ADD raw_audio COLUMN TO anno_ds containing audio from that split
         
-        anno_ds_processed = anno_ds.map(process_batch, kw_args={"model": self.model}, batched=True, num_processes=4)
+        chunk_ds_processed = chunk_ds.map(process_batch, kw_args={"model": self.model}, batched=True, num_processes=4)
         
-        return anno_ds_processed
+        return chunk_ds_processed
