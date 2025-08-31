@@ -72,7 +72,7 @@ def process_batch(batch, lag):
         
         entropy, complexity = Entropy(s), Entropy(s)*JSD(s)
         
-        egci_batch.append(np.array(entropy, complexity))
+        egci_batch.append([entropy, complexity])
     
     batch.update({"EGCI": egci_batch})
     
@@ -91,7 +91,6 @@ class EGCI():
     
     """
     def __init__(self, nlag=512):
-        print("EGCI __init__")
         self.nlag = nlag
         
 
@@ -106,7 +105,6 @@ class EGCI():
             KnowledgeDataset: _the same dataset but with EGCI column_ `tuple(entropy, complexity)`
         """
         chunk_ds = chunkDS.chunk_ds
-        print("EGCI __call__")
         
         #TODO ADD raw_audio COLUMN TO anno_ds containing audio from that split
         
