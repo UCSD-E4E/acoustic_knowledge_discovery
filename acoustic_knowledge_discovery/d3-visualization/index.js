@@ -316,10 +316,11 @@ require("d3@5")
 export default function define(runtime, observer) {
   const main = runtime.module();
   function toString() { return this.url; }
-  // const fileAttachments = new Map([
-  //   ["graph_representation.json", {url: new URL("./files/ebfa147f7218900de2e35380a53efbb7920c8d8d10bd70e45932efc56712293a937c8d4ffc73b604b2d5963fc6f2684ef36e9c82a16e5f80960805f185096a11.json", import.meta.url), mimeType: "application/json", toString}]
-  // ]);
-  // main.builtin("FileAttachment", runtime.fileAttachments(name => fileAttachments.get(name)));
+  const fileAttachments = new Map([
+    //["graph_representation.json", {url: new URL("./files/ebfa147f7218900de2e35380a53efbb7920c8d8d10bd70e45932efc56712293a937c8d4ffc73b604b2d5963fc6f2684ef36e9c82a16e5f80960805f185096a11.json", import.meta.url), mimeType: "application/json", toString}]
+    ["graph_representation.json", {url: new URL("./graph_representation.json", import.meta.url), mimeType: "application/json", toString}]
+  ]);
+  main.builtin("FileAttachment", runtime.fileAttachments(name => fileAttachments.get(name)));
   main.variable(observer()).define(["md"], _1);
   main.variable(observer("chart")).define("chart", ["d3","data","invalidation"], _chart);
   main.variable(observer("color")).define("color", ["d3"], _color);
