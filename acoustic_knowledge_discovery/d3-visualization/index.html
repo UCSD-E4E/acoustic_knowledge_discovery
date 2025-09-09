@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Audio Graph</title>
+<link rel="stylesheet" type="text/css" href="./inspector.css">
+<body>
+  <div id="layout">
+    <div id="observable-graph"></div>
+    <div id="sidebar"></div>
+  </div>
+</body>
+
+<style>
+  body {
+  margin: 0;
+  font-family: sans-serif;
+  height: 100vh;
+  overflow-y: auto;   /*vertical scroll*/
+  overflow-x: hidden;
+}
+
+#layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: 100vh;  /* allow height to grow */
+}
+
+#observable-graph {
+  flex-grow: 1;
+  min-width: 0;
+  padding: 10px;
+  overflow: visible;
+}
+
+#sidebar {
+  width: 800px;
+  padding: 12px;
+  background: #f9f9f9;
+  border-left: 1px solid #ccc;
+  height: 100vh;
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+}
+
+</style>
+
+
+<script type="module">
+import define from "./index.js";
+import {Runtime, Library, Inspector} from "./runtime.js";
+
+const runtime = new Runtime();
+const main = runtime.module(define, Inspector.into(document.getElementById("observable-graph")));
+</script>
