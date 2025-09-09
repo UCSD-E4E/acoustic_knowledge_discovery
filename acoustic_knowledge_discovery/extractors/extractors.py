@@ -1,22 +1,23 @@
 #from ABC import abstract
 from abc import ABC, abstractmethod
 from ..dataset import ChunkDataset
-from datasets import Dataset, DatasetDict, Sequence, Value
+from datasets import Dataset, DatasetDict, Sequence, Value, Audio
 from pathlib import Path
 from typing import Union
 import soundfile as sf
 import pandas as pd
 import math
 import os
+import librosa
 
 
 def audio_duration_seconds(path: str) -> float:
     try:
         info = sf.info(path)
         if info.frames and info.samplerate:
-            return info.frames / float(info.samplerate)
-        if info.duration:  
-            return float(info.duration)
+            return info.frames / float(info.samplerate), float(info.samplerate)
+        if info.duration and info.samplerate:  
+            return float(info.duration), float(info.samplerate)
     except Exception as e:
         print(
         f"Could not determine duration for: {path}. "
@@ -45,6 +46,9 @@ def split_label_cell(x: object) -> list[str]:
         return [x]
     else:
         return []
+    
+
+
 
 
 class Extractor():
@@ -62,7 +66,8 @@ class Extractor():
             files_csv: Union[str, Path], #metadata csv for files
             annos_csv: Union[str, Path], #annotations (ie timestamp) for each file 
             base_dir: Union[str, Path], #directory where files are stored
-            chunk_size: int = 5 #size of chunks in seconds
+            chunk_size: int = 5, #size of chunks in seconds
+            skip_last= True, #Block last chunk less than chunk_size
         ):
         """Initialize the Extractor with file paths and columns"""
         try:
@@ -78,17 +83,25 @@ class Extractor():
         
         #get durations for each file 
         durations = []
+        srs = []
         for _, row in df.iterrows():
             if pd.isna(row['file_name']):
                 raise ValueError(f"files_csv must contain a 'file_name' column with no missing values")
             file_path = self.base_dir / "files" / row['file_name']
+
+            # TODO handle this bad IO case for the user
+            # if Path("files") / Path("files") in file_path:
+            #     raise ValueError(f"Instead of {file_path}, just use something like {file_path.replace(Path("files") / Path("files"), "")}")
+
             if not file_path.exists():
                 raise ValueError(f"File {file_path} does not exist")
-            curr_duration= audio_duration_seconds(file_path.as_posix()) #.as_posix() converts to string & is good for cross platform compatibility
+            curr_duration, sr = audio_duration_seconds(file_path.as_posix()) #.as_posix() converts to string & is good for cross platform compatibility
             if (not curr_duration >0):
                 print(f"Non-positive duration for: {file_path}, skipping")
             durations.append(curr_duration)
+            srs.append(sr)
         df['duration'] = durations
+        df['SR'] = srs
 
         # create chunks for each file
         chunk_rows = []
@@ -99,7 +112,9 @@ class Extractor():
             n_chunks = max(1, math.ceil(duration / chunk_size))
             starts=[]
             for start in range(0, n_chunks * chunk_size, chunk_size):
-                if start < duration:
+                if start < duration and (
+                    start + chunk_size < duration and skip_last
+                ):
                     starts.append(start)
 
             for start in starts:
@@ -108,6 +123,7 @@ class Extractor():
                 rec["chunk_id"] = f"{str(row["file_name"])}_{start}"
                 rec["Annotation"] = []
                 rec["Confidence"] = []
+                rec["SR"] = row["SR"]
                 chunk_rows.append(rec)
 
         chunk_df = pd.DataFrame(chunk_rows)
@@ -158,8 +174,24 @@ class Extractor():
         feats = train_ds.features.copy()
         feats["Annotation"] = Sequence(Value("string")) #array of strings
         feats["Confidence"] = Sequence(Value("float32")) #array of floats
-        self.chunk_ds = DatasetDict({"train": train_ds.cast(feats)})
+        train_ds = train_ds.cast(feats)
 
+
+    #     # Get the audio
+    #     train_ds = train_ds.map(self.get_audio_data)
+    #     train_ds = train_ds.cast_column("audio", Audio(sampling_rate=train_ds[0]["audio"]["sampling_rate"]))
+
+
+        self.chunk_ds = DatasetDict({"train": train_ds})
+
+    # def get_audio_data(self, batch):
+    #     file_path = self.base_dir / "files" / batch["file_name"]
+    #     y, sr = librosa.load(path=file_path, offset=batch["chunk_start"], duration=self.chunk_size)
+    #     batch["audio"] = {
+    #         "array": y,
+    #         "sampling_rate": sr
+    #     }
+    #     return batch
 
     def forward(self) -> ChunkDataset:
         """Run the extractor and return a ChunkDataset"""
