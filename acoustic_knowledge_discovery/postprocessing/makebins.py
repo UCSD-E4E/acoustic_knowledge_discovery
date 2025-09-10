@@ -6,7 +6,7 @@ from datetime import date
 
 Bounds1D = Tuple[float, float]
 Bounds2D = Tuple[Tuple[float, float], Tuple[float, float]]
-BoundsDate = Tuple[date, date]
+BoundsDate = Tuple[str, str]  # "YYYY-MM-DD"
 
 
 class MakeBins2dFloat():
@@ -159,29 +159,74 @@ class MakeBins1dFloat():
 
 class MakeBinsDate():
     #bin = { 
-    #   "Dry" : ( date(2024, 5, 10), date(2024, 6, 10)),
-    #   "Rainy" : ( date (2024, 6, 12), date(2024, 7, 13))
+    #   "Dry":   ("2024-05-10", "2024-06-10"),
+    #   "Rainy": ("2024-06-12", "2024-07-13")
     #}
     def __init__(self, chunk_ds: ChunkDataset):
         self.chunk_ds= chunk_ds.chunk_ds
 
     def __call__(self,
                 column_name: str,
-                bin_dict: Dict[str, BoundsDate]):
-        pass
+                bin_dict: Dict[str, BoundsDate],
+                include_right: bool = False) -> ChunkDataset:
         out_col = f"{column_name}_bin"
 
         try:
-            chunk_ds = self.chunk_ds.cast_column(column_name, Value(dtype="float64"))
+            chunk_ds = self.chunk_ds.cast_column(column_name, Value("string"))
         except Exception as e:
             raise ValueError(
-                f"Column {column_name} is not a numeric float and cannot be binned. Original error: {e}"
+                f"Column {column_name} cannot be casted to a string and, hence, cannot be binned. Original error: {e}"
             )
         
         bin_labels = list(bin_dict.keys())
         bin_labels_with_other = bin_labels + ["Other"]
+
+        # Convert string bounds to datetime64[D] so that you can compare what event came before or after the bounds
+        bounds_arr = np.array(
+            [
+                #Converts both strings "YYYY-MM-DD" into numpy.datetime64 objects with day precision
+                [np.datetime64(lo, "D"), np.datetime64(hi, "D")] 
+                for lo, hi in (bin_dict[name] for name in bin_labels)
+            ],
+            dtype="datetime64[D]"
+        )
+
+        def _batch_fn(batch):
+            dt = np.array([np.datetime64(v, "D") for v in batch[column_name]], dtype="datetime64[D]")
+
+            #same logic as 1dFloat
+            N = dt.size
+            K = bounds_arr.shape[0]
+            match = np.zeros((N, K), dtype=bool)
+
+            for k in range(K):
+                lo, hi = bounds_arr[k]
+                if include_right:
+                    # [lo, hi]
+                    m = (dt >= lo) & (dt <= hi)
+                else:
+                    # [lo, hi)
+                    m = (dt >= lo) & (dt < hi)
+                match[:, k] = m
+
+            any_match = match.any(axis=1)
+            first_idx = match.argmax(axis=1)
+            idxs = np.where(any_match, first_idx, len(bin_labels))
+
+            return {out_col: [bin_labels_with_other[i] for i in idxs]}
+        
+        chunk_ds = chunk_ds.map(_batch_fn, batched=True)
+
+        class_label = ClassLabel(names=bin_labels_with_other)
+        chunk_ds = chunk_ds.cast_column(out_col, class_label)
+
+        chunk_ds = chunk_ds.remove_columns(column_name)
+        chunk_ds = chunk_ds.rename_column(out_col, column_name)
+
+        return ChunkDataset(chunk_ds)
+        
     
-#now implement for date and time
+#now implement for time
 
 
     

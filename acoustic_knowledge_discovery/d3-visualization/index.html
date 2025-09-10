@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <title>Audio Graph</title>
-<link rel="stylesheet" type="text/css" href="./inspector.css">
+<!--<link rel="stylesheet" type="text/css" href="./inspector.css">-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@observablehq/inspector@5/dist/inspector.css">
 <body>
   <div id="layout">
     <div id="observable-graph"></div>
@@ -49,8 +50,8 @@
 
 <script type="module">
 import define from "./index.js";
-import {Runtime, Library, Inspector} from "./runtime.js";
-
+//import {Runtime, Library, Inspector} from "./runtime.js";
+import { Runtime, Library, Inspector } from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@5/dist/runtime.js";
 const runtime = new Runtime();
 const main = runtime.module(define, Inspector.into(document.getElementById("observable-graph")));
 </script>
