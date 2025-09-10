@@ -24,9 +24,8 @@ function _chart(d3,data,invalidation)
     //{ source: "Bat", target: "4PM - 11:59PM", value: 1, predicted: true, confidence: 0.2450 }
   ];
 
-  const links = [...data.links.map(d => ({ ...d })), ...predictedLinks];
-
-
+  // const links = [...data.links.map(d => ({ ...d })), ...predictedLinks];
+  const links = [...data.links.map(d => ({ ...d })),];
   //store # of edges for each node so that you dynamically change node size
   const degreeMap = new Map();
   nodes.forEach(d => degreeMap.set(d.id, 0)); //initialize to 0
@@ -44,7 +43,7 @@ function _chart(d3,data,invalidation)
     .domain(d3.extent(nodes, d => degreeMap.get(d.id))) // [minDegree, maxDegree]
     .range([8, 16]);  // you can tweak this range as desired
 
-
+  console.log("Post link processing")
 
   // Create a simulation with several forces.
   const simulation = d3.forceSimulation(nodes)
@@ -61,6 +60,7 @@ function _chart(d3,data,invalidation)
       .attr("viewBox", [-width / 2, -height / 2, width, height])
       .attr("style", "height: auto; max-width: 100%;")
 
+  console.log("after svg")
 
   // Add a line for each link, and a circle for each node.
   const link = svg.append("g")
@@ -109,7 +109,7 @@ function _chart(d3,data,invalidation)
      .attr("font-size", d => fontSizeScale(degreeMap.get(d.id)) + "px")
       .text(function(d) { return d.id });
 
-
+  console.log("pre legend")
   
   // Create a legend group in the top-left corner
   const legend = svg.append("g")

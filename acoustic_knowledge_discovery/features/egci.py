@@ -94,7 +94,7 @@ class EGCI():
         self.nlag = nlag
         
 
-    def __call__(self, chunkDS: ChunkDataset) -> ChunkDataset:
+    def __call__(self, chunkDS: ChunkDataset, num_proc=4) -> ChunkDataset:
         """
         Parameters
         ----------
@@ -108,7 +108,7 @@ class EGCI():
         
         #TODO ADD raw_audio COLUMN TO anno_ds containing audio from that split
         
-        chunk_ds_processed = chunk_ds.map(process_batch, fn_kwargs={"lag": self.nlag}, batched=True, num_proc=4)
+        chunk_ds_processed = chunk_ds.map(process_batch, fn_kwargs={"lag": self.nlag}, batched=True, num_proc=num_proc)
         
         return ChunkDataset(chunk_ds=chunk_ds_processed)
     
