@@ -82,9 +82,8 @@ class AutoEncoder():
             self.decoder
         ).to(device)
         
-        state = torch.load(model_state)
-        
-        self.model.load_state_dict(state).eval().to(device)
+        self.model.load_state_dict(model_state)
+        self.model.eval().to(device)
         
     def embed(self, x):
         label = x.to(self.device)[..., :256]

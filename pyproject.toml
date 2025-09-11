@@ -11,9 +11,13 @@ dependencies = [
     "pydub>=0.25.1",
     "torch>=2.8.0",
     "statsmodels>=0.14.5",
+    "pyha-analyzer",
 ]
 
 [dependency-groups]
 dev = [
     "ipykernel>=6.30.1",
 ]
+
+[tool.uv.sources]
+pyha-analyzer = { git = "https://github.com/UCSD-E4E/pyha-analyzer-2.0.git" }
