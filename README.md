@@ -8,7 +8,7 @@ This repository provides an end-to-end pipeline for characterizing large-scale b
 * **Template matching**: finds a target pattern (template) within a larger audio file
 * **EGCI**: quantifies the complexity and entropy of each audio chunk.
 
-Currently, the pipeline supports EGCI and template matching; more methods are planned.
+    Currently, the pipeline supports EGCI and template matching; more methods are planned.
 
 4. **Embed & cluster.** Chunks are encoded into 10-dimensional vector embeddings using an autoencoder, then clustered with K-Means. 
 5. **Visualize.** Results are converted to a graph and rendered with D3.js, allowing the user to interactively explore the data (e.g., viewing connections, filtering nodes, etc).  
