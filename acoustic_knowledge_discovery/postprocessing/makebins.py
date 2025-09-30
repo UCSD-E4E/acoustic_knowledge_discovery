@@ -79,8 +79,8 @@ class MakeBins2dFloat():
         chunk_ds = chunk_ds.map(_batch_fn, batched=True)
 
         # Cast to categorical with stable label ordering
-        class_label = ClassLabel(names=bin_labels_with_other)
-        chunk_ds = chunk_ds.cast_column(out_col, class_label)
+        # class_label = ClassLabel(names=bin_labels_with_other)
+        # chunk_ds = chunk_ds.cast_column(out_col, class_label)
         
         #delete original column & rename the bin to the original name
         chunk_ds= chunk_ds.remove_columns(column_name)
