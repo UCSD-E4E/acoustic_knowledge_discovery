@@ -4,6 +4,8 @@ import numpy as np
 from scipy.linalg import toeplitz
 from scipy.stats import zscore, entropy
 from statsmodels.tsa.stattools import acf
+import librosa
+import os
 
 def Entropy(p1: np.ndarray) -> np.ndarray:
     """
@@ -39,7 +41,7 @@ def JSD(p: np.ndarray, q=None) -> tuple[float]:
 
 # https://github.com/juancolonna/EGCI/blob/master/Example_of_EGCI_calculation.ipynb
     
-def process_batch(batch, lag):
+def process_batch(batch, lag, chunk_size=5):
     """
     Calculates EGCI in batch according to the method outlined in Colonna et. al. (2020)
     
@@ -56,27 +58,53 @@ def process_batch(batch, lag):
     von Neumann Entropy, EGCI for the given audio
     """
     
-    audio_batch = batch['raw_audio']
+    #audio_batch = batch['raw_audio']
     
     egci_batch = []
-    
-    for raw_audio in audio_batch:
-        x = zscore(raw_audio)
-        
+
+    for path, start in zip(batch["file_path"], batch["chunk_start"]):
+        # Load exactly the needed window, keep original sr
+        y, _ = librosa.load(
+            os.fspath(path),
+            offset=float(start),
+            duration=float(chunk_size),
+            sr=None
+        )
+
+        x = zscore(y.astype(np.float32), ddof=0)
         # Algorithm steps 
         rxx = acf(x, nlags=lag, adjusted=True, fft=True)
-        
+
         #https://github.com/blue-yonder/tsfresh/issues/902
         Sxx = toeplitz(rxx)
-        s = np.linalg.svd(Sxx)[1] #svd(Sxx)
-        
-        entropy, complexity = Entropy(s), Entropy(s)*JSD(s)
-        
-        egci_batch.append([entropy, complexity])
+        s = np.linalg.svd(Sxx, compute_uv=False)
+
+        entropy = Entropy(s)
+        complexity = entropy * JSD(s)
+
+        egci_batch.append([float(entropy), float(complexity)])
+
+    return {"EGCI": egci_batch}
+
+
     
-    batch.update({"EGCI": egci_batch})
+    # for raw_audio in audio_batch:
+    #     x = zscore(raw_audio)
+        
+    #     # Algorithm steps 
+    #     rxx = acf(x, nlags=lag, adjusted=True, fft=True)
+        
+    #     #https://github.com/blue-yonder/tsfresh/issues/902
+    #     Sxx = toeplitz(rxx)
+    #     s = np.linalg.svd(Sxx)[1] #svd(Sxx)
+        
+    #     entropy, complexity = Entropy(s), Entropy(s)*JSD(s)
+        
+    #     egci_batch.append([entropy, complexity])
     
-    return batch
+    # batch.update({"EGCI": egci_batch})
+    
+    # return batch
 
 
 class EGCI():
@@ -94,7 +122,7 @@ class EGCI():
         self.nlag = nlag
         
 
-    def __call__(self, chunkDS: ChunkDataset, num_proc=4) -> ChunkDataset:
+    def __call__(self, chunkDS: ChunkDataset, chunk_size, num_proc=4) -> ChunkDataset:
         """
         Parameters
         ----------
@@ -108,7 +136,7 @@ class EGCI():
         
         #TODO ADD raw_audio COLUMN TO anno_ds containing audio from that split
         
-        chunk_ds_processed = chunk_ds.map(process_batch, fn_kwargs={"lag": self.nlag}, batched=True, num_proc=num_proc)
+        chunk_ds_processed = chunk_ds.map(process_batch, fn_kwargs={"lag": self.nlag, "chunk_size":chunk_size}, batched=True, num_proc=num_proc)
         
         return ChunkDataset(chunk_ds=chunk_ds_processed)
     

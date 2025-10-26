@@ -8,6 +8,7 @@ from pyha_analyzer.preprocessors.preprocessors import PreProcessorBase
 import numpy as np
 import librosa
 from torch import Tensor
+import os
 
 
 if torch.cuda.is_available():
@@ -46,29 +47,35 @@ class MelSpectrogramPreprocessors(PreProcessorBase):
         # print("process with melspec")
         new_audio = []
         new_labels = []
-        for item_idx in range(len(batch["raw_audio"])):
-            
-            y, sr = np.array(batch["raw_audio"][item_idx]), batch["SR"][item_idx]
-            y, sr = librosa.resample(y, orig_sr=sr, target_sr=32_000), 32_000
-            
-            pillow_transforms = transforms.ToPILImage()
-            
+        pillow_transforms = transforms.ToPILImage()
+        for item_idx in range(len(batch["file_path"])):
+            path = batch["file_path"][item_idx]
+            start = float(batch["chunk_start"][item_idx])
+            y, sr = librosa.load(
+                os.fspath(path),
+                offset=start,
+                duration=self.duration,
+                sr=32_000,       
+                mono=True
+            )
+            y = np.asarray(y, dtype=np.float32)
+            sr = 32_000
+
             mels = np.array(
                 pillow_transforms(
                     librosa.feature.melspectrogram(
                         y=y, sr=sr,
-                        n_fft=self.n_fft, 
-                        hop_length=self.hop_length, 
-                        power=self.power, 
-                        n_mels=self.n_mels, 
+                        n_fft=self.n_fft,
+                        hop_length=self.hop_length,
+                        power=self.power,
+                        n_mels=self.n_mels,
                     )
                 ),
-                np.float32)[np.newaxis, ::] / 255
+                dtype=np.float32
+            )[np.newaxis, ...] / 255.0
             new_audio.append(mels)
-            
-        
-        # batch["audio"] = new_audio 
-        input_data = Tensor(np.concat(new_audio)).unsqueeze(1) 
+
+        input_data = Tensor(np.concatenate(new_audio, axis=0)).unsqueeze(1)
         return input_data
 
 
@@ -119,7 +126,7 @@ class AutoEncoderProcessor():
         }    
         
 
-    def __call__(self, chunkDS: ChunkDataset) -> ChunkDataset:
+    def __call__(self, chunkDS: ChunkDataset, chunk_size) -> ChunkDataset:
         """
         Parameters
         ----------
@@ -129,7 +136,7 @@ class AutoEncoderProcessor():
         -------
             KnowledgeDataset: _the same dataset but with EGCI column_ `tuple(entropy, complexity)`
         """
-        test = MelSpectrogramPreprocessors()
+        test = MelSpectrogramPreprocessors(duration=chunk_size)
         chunkDS.chunk_ds.set_transform(test)
         
         #TODO ADD raw_audio COLUMN TO anno_ds containing audio from that split

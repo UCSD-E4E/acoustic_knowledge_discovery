@@ -43,7 +43,7 @@ class MakeBins2dFloat():
             arr = np.asarray(batch[column_name], dtype=float)
             #if malformed, then set everything equal to Other  
             if arr.ndim != 2 or arr.shape[1] != 2:
-                print("other filled in")
+                #print("other filled in")
                 return {out_col: ["Other"] * len(batch[column_name])}
 
             #separate x and y coordinates into 1d arrays
@@ -59,13 +59,13 @@ class MakeBins2dFloat():
                 if include_right:
                     #[lo, hi]
                     m = (x >= x_lo) & (x <= x_hi) & (y >= y_lo) & (y <= y_hi)
-                    print(f"x is {x}, x_lo is {x_lo}, x_hi is {x_hi} ")
-                    print(f"y is {y}, y_lo is {y_lo}, y_hi is {y_hi} ")
+                    # print(f"x is {x}, x_lo is {x_lo}, x_hi is {x_hi} ")
+                    # print(f"y is {y}, y_lo is {y_lo}, y_hi is {y_hi} ")
                 else:
                     #[lo, hi)
                     m = (x >= x_lo) & (x <  x_hi) & (y >= y_lo) & (y <  y_hi)
-                    print(f"x is {x}, x_lo is {x_lo}, x_hi is {x_hi} ")
-                    print(f"y is {y}, y_lo is {y_lo}, y_hi is {y_hi} ")
+                    # print(f"x is {x}, x_lo is {x_lo}, x_hi is {x_hi} ")
+                    # print(f"y is {y}, y_lo is {y_lo}, y_hi is {y_hi} ")
                 #store into column k
                 match[:, k] = m
 

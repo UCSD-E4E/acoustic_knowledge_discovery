@@ -21,15 +21,23 @@ def get_species_name(filename):
 
 
 class TemplateMatching(FeaturePreprocessor):
-    def __init__(self, CLIP_PATH: str | Path, TEMPLATE_PATH: str | Path, THRESHOLD: float, chunk_size: int = 5):
+    def __init__(self, 
+                 #CLIP_PATH: str | Path, 
+                 TEMPLATE_PATH: str | Path, 
+                 THRESHOLD: float, 
+                 chunk_size: int = 5):
         super().__init__("TemplateMatching")
-        self.CLIP_PATH = CLIP_PATH
+        #self.CLIP_PATH = CLIP_PATH
         self.TEMPLATE_PATH = TEMPLATE_PATH
         self.THRESHOLD = THRESHOLD
         self.chunk_size= chunk_size
 
     def __call__(self, chunkDS: ChunkDataset) -> ChunkDataset:
         chunk_ds = chunkDS.chunk_ds
+        file_paths = chunk_ds["train"]["file_path"]
+        print("Number of files to process: ", len(file_paths))
+        file_names = chunk_ds["train"]["file_name"]
+        print("Number of file_names", len(file_names))
 
         total_matches_count = 0
 
@@ -79,74 +87,75 @@ class TemplateMatching(FeaturePreprocessor):
                 lenOfTemplate = len(audioTemplate) / 1000 
 
                 # Process each audio clip in the clips directory
-                for clip in os.listdir(self.CLIP_PATH):
-                    if clip.lower().endswith('.wav'):
-                        #f.write(f"Processing {clip}\n")
-                        clip_path = os.path.join(self.CLIP_PATH, clip)
+                #for clip in os.listdir(self.CLIP_PATH):
+                for clip_path, clip in zip(file_paths, file_names):
+                    # if clip.lower().endswith('.wav'):
+                    #     #f.write(f"Processing {clip}\n")
+                    #     clip_path = os.path.join(self.CLIP_PATH, clip)
                         
-                        try:
-                            y_clip, sr_clip, duration_clip_seconds = fast_audio_load(clip_path, target_sr=22050)
-                            #f.write(f"Loaded clip: {clip} (duration: {len(y_clip)/sr_clip:.1f}s)\n")
-                        except Exception as exception:
-                            print(f"ERROR: Failed to load {clip}: {str(exception)}\n")
-                            print(f"Skipping this clip.\n\n")
-                            continue
-                        
-                        # Process clip using same frequency filtering as template
-                        clip_spec = compute_mel_spectrogram(y_clip, sr_clip)
-                        #f.write(f"Clip shape (full): {clip_spec.shape}\n")
-                        
-                        clip_spec_filtered = filter_spectrogram_by_frequency_range(clip_spec, freq_min, freq_max)
-                        clip_img = spectrogram_to_image(clip_spec_filtered)
-                        #f.write(f"Clip shape (filtered): {clip_spec_filtered.shape}\n")
+                    try:
+                        y_clip, sr_clip, duration_clip_seconds = fast_audio_load(clip_path, target_sr=22050)
+                        #f.write(f"Loaded clip: {clip} (duration: {len(y_clip)/sr_clip:.1f}s)\n")
+                    except Exception as exception:
+                        print(f"ERROR: Failed to load {clip}: {str(exception)}\n")
+                        print(f"Skipping this clip.\n\n")
+                        continue
+                    
+                    # Process clip using same frequency filtering as template
+                    clip_spec = compute_mel_spectrogram(y_clip, sr_clip)
+                    #f.write(f"Clip shape (full): {clip_spec.shape}\n")
+                    
+                    clip_spec_filtered = filter_spectrogram_by_frequency_range(clip_spec, freq_min, freq_max)
+                    clip_img = spectrogram_to_image(clip_spec_filtered)
+                    #f.write(f"Clip shape (filtered): {clip_spec_filtered.shape}\n")
 
-                        # Perform template matching using OpenCV
-                        res = cv.matchTemplate(clip_img, template_img, cv.TM_CCOEFF_NORMED)
-                        #f.write(f"Performed frequency-filtered template matching for {clip}\n")
-                        
-                        # Filter all matches above threshold
-                        locations = np.where(res >= self.THRESHOLD)
-                        matches = []
-                        for pt in zip(*locations[::-1]):
-                            score = res[pt[1], pt[0]]
-                            matches.append((pt[1], pt[0], score))
+                    # Perform template matching using OpenCV
+                    res = cv.matchTemplate(clip_img, template_img, cv.TM_CCOEFF_NORMED)
+                    #f.write(f"Performed frequency-filtered template matching for {clip}\n")
+                    
+                    # Filter all matches above threshold
+                    locations = np.where(res >= self.THRESHOLD)
+                    matches = []
+                    for pt in zip(*locations[::-1]):
+                        score = res[pt[1], pt[0]]
+                        matches.append((pt[1], pt[0], score))
 
-                        matches.sort(key=lambda x: x[2], reverse=True)
-                        #f.write(f"Found {len(matches)} matches above threshold {THRESHOLD}\n")
+                    matches.sort(key=lambda x: x[2], reverse=True)
+                    #f.write(f"Found {len(matches)} matches above threshold {THRESHOLD}\n")
 
-                        # Set the suppression_distance to half of the length of the template
-                        template_length_frames = template_img.shape[1]
-                        suppression_distance = int(template_length_frames)
-                        #f.write(f"Suppression distance (frames): {suppression_distance}\n")
+                    # Set the suppression_distance to half of the length of the template
+                    template_length_frames = template_img.shape[1]
+                    suppression_distance = int(template_length_frames)
+                    #f.write(f"Suppression distance (frames): {suppression_distance}\n")
 
-                        # Apply non-maximum suppression to avoid overlapping detections
-                        selected = []
-                        for y, x, score in matches:
-                            if all(abs(x - xc) > suppression_distance for _, xc, _ in selected):
-                                selected.append((y, x, score))
+                    # Apply non-maximum suppression to avoid overlapping detections
+                    selected = []
+                    for y, x, score in matches:
+                        if all(abs(x - xc) > suppression_distance for _, xc, _ in selected):
+                            selected.append((y, x, score))
 
-                        # Save all matches to CSV with timestamps
-                        seconds_per_col = 512 / sr_clip
-                        #with open(self.CSV_OUTPUT_FILE, 'a', newline='') as csvfile:
-                        #csv_writer = csv.writer(csvfile)
-                        for y, x, score in selected:
-                            timestamp_match = x * seconds_per_col
+                    # Save all matches to CSV with timestamps
+                    seconds_per_col = 512 / sr_clip
+                    #with open(self.CSV_OUTPUT_FILE, 'a', newline='') as csvfile:
+                    #csv_writer = csv.writer(csvfile)
+                    for y, x, score in selected:
+                        timestamp_match = x * seconds_per_col
 
-                            chunk_ds["train"] = insert_annotation_ds(chunk_ds["train"], 
-                                                                     file_name=clip, 
-                                                                     anno_start=float(timestamp_match), 
-                                                                     anno_end = float(min(timestamp_match + lenOfTemplate, duration_clip_seconds)), 
-                                                                     annotation = template_name_clean , 
-                                                                     confidence = float(score),
-                                                                     chunk_size=self.chunk_size
-                                                                    )
-                                
-                            #csv_writer.writerow([clip,timestamp_match, min(timestamp_match + lenOfTemplate, lenOfClip), template_name_clean,  score])
-                        
-                        total_matches_count += len(selected)
-                        
-                        clip_names.append(clip)
-                        match_counts.append(len(selected))
+                        chunk_ds["train"] = insert_annotation_ds(chunk_ds["train"], 
+                                                                    file_name=clip, 
+                                                                    anno_start=float(timestamp_match), 
+                                                                    anno_end = float(min(timestamp_match + lenOfTemplate, duration_clip_seconds)), 
+                                                                    annotation = template_name_clean , 
+                                                                    confidence = float(score),
+                                                                    chunk_size=self.chunk_size
+                                                                )
+                            
+                        #csv_writer.writerow([clip,timestamp_match, min(timestamp_match + lenOfTemplate, lenOfClip), template_name_clean,  score])
+                    
+                    total_matches_count += len(selected)
+                    
+                    clip_names.append(clip)
+                    match_counts.append(len(selected))
 
                 # Update progress indicator
                 template_count += 1
