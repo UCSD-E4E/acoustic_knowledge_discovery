@@ -35,9 +35,7 @@ class TemplateMatching(FeaturePreprocessor):
     def __call__(self, chunkDS: ChunkDataset) -> ChunkDataset:
         chunk_ds = chunkDS.chunk_ds
         file_paths = chunk_ds["train"]["file_path"]
-        print("Number of files to process: ", len(file_paths))
         file_names = chunk_ds["train"]["file_name"]
-        print("Number of file_names", len(file_names))
 
         total_matches_count = 0
 
