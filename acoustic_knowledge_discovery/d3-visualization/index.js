@@ -18,11 +18,11 @@ function _chart(d3,data,invalidation)
   //const links = data.links.map()
   const nodes = data.nodes.map(d => ({...d}));
 
-  const predictedLinks = [
-    { source: "SERRA_20250503_174806.wav", target: "Blips Sparse", value: 1, predicted: true, confidence: 0.9014 },
-    { source: "SERRA_20250503_175042.wav", target: "Blips Sparse", value: 1, predicted: true, confidence: 0.9008 },
-    //{ source: "Bat", target: "4PM - 11:59PM", value: 1, predicted: true, confidence: 0.2450 }
-  ];
+  // const predictedLinks = [
+  //   { source: "Time of Day_Morning", target: "Location Name_Sand Forest", value: 1, predicted: true, confidence: 0.9014 },
+  //   { source: "Time of Day_Morning", target: "Location Name_Lion House", value: 1, predicted: true, confidence: 0.9008 },
+  //   //{ source: "Bat", target: "4PM - 11:59PM", value: 1, predicted: true, confidence: 0.2450 }
+  // ];
 
   // const links = [...data.links.map(d => ({ ...d })), ...predictedLinks];
   const links = [...data.links.map(d => ({ ...d })),];
@@ -48,7 +48,7 @@ function _chart(d3,data,invalidation)
   // Create a simulation with several forces.
   const simulation = d3.forceSimulation(nodes)
       .force("link", d3.forceLink(links).id(d => d.id))
-      //.force("linkLabels", d3.forceLink(predictedLinks).id(d => d.id))
+      .force("linkLabels", d3.forceLink(links).id(d => d.id))
       .force("charge", d3.forceManyBody().strength(-1000))
       .force("x", d3.forceX())
       .force("y", d3.forceY());
@@ -88,11 +88,11 @@ function _chart(d3,data,invalidation)
   
   const linkLabels = svg.append("g")
     .selectAll("text")
-    .data(links.filter(d => typeof d.confidence !== "undefined"))
+    .data(links.filter(d => typeof d.weight !== "undefined"))
     .join("text")
       .attr("font-size", "12px")
       .attr("fill", "#0da87fff")
-      .text(d => d.confidence.toFixed(2));
+      .text(d => d.weight.toFixed(2));
 
 
   node.append("title")
