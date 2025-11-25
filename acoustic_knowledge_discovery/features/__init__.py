@@ -4,3 +4,4 @@ from .frequency import Frequency
 from .feature_preprocessing_pipeline import FeatureSequential
 from .egci import EGCI
 from .autoencode import AutoEncoderProcessor
+from .Volume import Volume
