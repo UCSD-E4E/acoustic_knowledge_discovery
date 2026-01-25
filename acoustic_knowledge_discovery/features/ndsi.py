@@ -5,7 +5,7 @@ import os
 
 def calculate_ndsi_score(magnitude_spec, freqs) -> float:
     """
-    Helper to calculate NDSI from a magnitude spectrogram.
+    Calculation helper
     NDSI = (Biophony - Anthropophony) / (Biophony + Anthropophony)
     """
     # frequency bands
@@ -29,11 +29,11 @@ def calculate_ndsi_score(magnitude_spec, freqs) -> float:
 
 def process_batch_ndsi(batch, chunk_size):
     """
-    Loads audio, computes spectrogram, and calculates NDSI for each chunk in the batch.
+    Loads audio, computes spectrogram, and calculates NDSI for batch.
     """
     ndsi_scores = []
     
-    # Iterate through the batch of files and start times
+    # batches of files and start times
     for path, start in zip(batch["file_path"], batch["chunk_start"]):
         try:
             # Load Audio
@@ -69,25 +69,12 @@ def process_batch_ndsi(batch, chunk_size):
 class NDSI():
     """
     Calculates the Normalized Difference Soundscape Index (NDSI)
-    for the knowledge graph.
     """
     def __init__(self):
         pass
 
     def __call__(self, chunkDS: ChunkDataset, chunk_size: int, num_proc=4) -> ChunkDataset:
-        """
-        Parameters
-        ----------
-            chunkDS (ChunkDataset): The input dataset
-            chunk_size (int): Size of chunks in seconds
-
-        Returns
-        -------
-            ChunkDataset: The same dataset with a new 'NDSI' column (float)
-        """
         chunk_ds = chunkDS.chunk_ds
-        
-        print("Computing NDSI feature...")
         
         chunk_ds_processed = chunk_ds.map(
             process_batch_ndsi, 
