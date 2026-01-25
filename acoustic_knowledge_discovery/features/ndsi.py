@@ -49,13 +49,13 @@ def process_batch_ndsi(batch, chunk_size):
                 ndsi_scores.append(0.0)
                 continue
 
-            # Generate Spectrogram
+            # Spectrogram
             S = np.abs(librosa.stft(y, n_fft=2048, hop_length=512))
             
-            # Get Frequencies 
+            # Frequencies 
             freqs = librosa.fft_frequencies(sr=sr, n_fft=2048)
 
-            # Calculate
+            # score
             score = calculate_ndsi_score(S, freqs)
             ndsi_scores.append(score)
 
@@ -63,7 +63,6 @@ def process_batch_ndsi(batch, chunk_size):
             print(f"Error processing NDSI for {path} at {start}: {e}")
             ndsi_scores.append(0.0)
 
-    # Return dictionary
     return {"NDSI": ndsi_scores}
 
 class NDSI():
