@@ -12,6 +12,7 @@ dependencies = [
     "torch>=2.8.0",
     "statsmodels>=0.14.5",
     "pyha-analyzer",
+    "matplotlib>=3.10.8",
 ]
 
 [dependency-groups]

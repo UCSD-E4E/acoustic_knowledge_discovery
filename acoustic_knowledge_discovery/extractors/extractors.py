@@ -99,6 +99,7 @@ class Extractor():
         if "file_name" not in df.columns:
             raise ValueError("files_csv must contain a 'file_name' column")
         
+        count=0
         #get durations for each file 
         durations = []
         srs = []
@@ -170,6 +171,7 @@ class Extractor():
         chunk_rows = []
         keep_cols = [c for c in df.columns if c != "duration"]
         for _, row in df.iterrows():
+            count+=1
             duration = float(row["duration"])
             # start times: 0, 5, 10, … (start < duration)
             n_chunks = max(1, math.ceil(duration / chunk_size))
@@ -190,6 +192,7 @@ class Extractor():
                 chunk_rows.append(rec)
 
         chunk_df = pd.DataFrame(chunk_rows)
+        print("Kept ", count, " files after processing files_csv")
 
         # read & validate annos_csv 
         annos = pd.read_csv(annos_csv)

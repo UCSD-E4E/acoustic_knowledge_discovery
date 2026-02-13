@@ -1,1 +1,387 @@
-{"nodes": [{"id": "file_name_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3", "group": 0}, {"id": "file_name_XC758442 - Common Blackbird - Turdus merula.wav", "group": 0}, {"id": "season_Rainy", "group": 1}, {"id": "season_Dry", "group": 1}, {"id": " time_of_day_Morning", "group": 2}, {"id": " time_of_day_Afternoon", "group": 2}, {"id": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_0", "group": 3}, {"id": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_5", "group": 3}, {"id": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_10", "group": 3}, {"id": "chunk_id_XC758442 - Common Blackbird - Turdus merula.wav_0", "group": 3}, {"id": "EGCI_Other", "group": 4}, {"id": "EGCI_low", "group": 4}, {"id": "EGCI_medium", "group": 4}, {"id": "TemporalPattern_Bursty", "group": 5}, {"id": "sample_models/dim_10_muha.pt_embeddings_clusters_1", "group": 6}, {"id": "sample_models/dim_10_muha.pt_embeddings_clusters_0", "group": 6}, {"id": "Annotation_owl", "group": 7}, {"id": "Annotation_nan", "group": 7}, {"id": "Annotation_XC758442 - Common Blackbird - Turdus merula", "group": 7}, {"id": "Frequency_frequency_Low", "group": 8}, {"id": "Frequency_frequency_Mid", "group": 8}, {"id": "Frequency_frequency_High", "group": 8}, {"id": "Volume_bin_High", "group": 9}, {"id": "Volume_bin_Low", "group": 9}], "links": [{"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_0", "target": "file_name_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_5", "target": "file_name_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_10", "target": "file_name_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3", "value": 1}, {"source": "chunk_id_XC758442 - Common Blackbird - Turdus merula.wav_0", "target": "file_name_XC758442 - Common Blackbird - Turdus merula.wav", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_0", "target": "season_Rainy", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_5", "target": "season_Rainy", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_10", "target": "season_Rainy", "value": 1}, {"source": "chunk_id_XC758442 - Common Blackbird - Turdus merula.wav_0", "target": "season_Dry", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_0", "target": " time_of_day_Morning", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_5", "target": " time_of_day_Morning", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_10", "target": " time_of_day_Morning", "value": 1}, {"source": "chunk_id_XC758442 - Common Blackbird - Turdus merula.wav_0", "target": " time_of_day_Afternoon", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_0", "target": "EGCI_Other", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_5", "target": "EGCI_low", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_10", "target": "EGCI_medium", "value": 1}, {"source": "chunk_id_XC758442 - Common Blackbird - Turdus merula.wav_0", "target": "EGCI_Other", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_0", "target": "TemporalPattern_Bursty", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_5", "target": "TemporalPattern_Bursty", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_10", "target": "TemporalPattern_Bursty", "value": 1}, {"source": "chunk_id_XC758442 - Common Blackbird - Turdus merula.wav_0", "target": "TemporalPattern_Bursty", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_0", "target": "sample_models/dim_10_muha.pt_embeddings_clusters_1", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_5", "target": "sample_models/dim_10_muha.pt_embeddings_clusters_0", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_10", "target": "sample_models/dim_10_muha.pt_embeddings_clusters_0", "value": 1}, {"source": "chunk_id_XC758442 - Common Blackbird - Turdus merula.wav_0", "target": "sample_models/dim_10_muha.pt_embeddings_clusters_0", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_0", "target": "Annotation_owl", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_5", "target": "Annotation_owl", "value": 1}, {"source": "chunk_id_XC758442 - Common Blackbird - Turdus merula.wav_0", "target": "Annotation_XC758442 - Common Blackbird - Turdus merula", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_0", "target": "Frequency_frequency_Low", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_0", "target": "Frequency_frequency_Mid", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_5", "target": "Frequency_frequency_Low", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_5", "target": "Frequency_frequency_Mid", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_5", "target": "Frequency_frequency_High", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_10", "target": "Frequency_frequency_Low", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_10", "target": "Frequency_frequency_Mid", "value": 1}, {"source": "chunk_id_XC758442 - Common Blackbird - Turdus merula.wav_0", "target": "Frequency_frequency_Mid", "value": 1}, {"source": "chunk_id_XC758442 - Common Blackbird - Turdus merula.wav_0", "target": "Frequency_frequency_High", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_0", "target": "Volume_bin_High", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_5", "target": "Volume_bin_Low", "value": 1}, {"source": "chunk_id_XC233970 - Black-chinned Sparrow - Spizella atrogularis.mp3_10", "target": "Volume_bin_High", "value": 1}, {"source": "chunk_id_XC758442 - Common Blackbird - Turdus merula.wav_0", "target": "Volume_bin_Low", "value": 1}]}
+{
+  "nodes": [
+    {
+      "id": "group::0",
+      "label": "Files",
+      "group": 0,
+      "type": "collapsed_group"
+    },
+    {
+      "id": "Folder_Degraded_Reef",
+      "label": "Folder_Degraded_Reef",
+      "group": 1,
+      "type": "feature"
+    },
+    {
+      "id": "Folder_Non_Degraded_Reef",
+      "label": "Folder_Non_Degraded_Reef",
+      "group": 1,
+      "type": "feature"
+    },
+    {
+      "id": "Sub/folder_Pavonas_June2025",
+      "label": "Sub/folder_Pavonas_June2025",
+      "group": 2,
+      "type": "feature"
+    },
+    {
+      "id": "Sub/folder_July_2024",
+      "label": "Sub/folder_July_2024",
+      "group": 2,
+      "type": "feature"
+    },
+    {
+      "id": "Sub/folder_May_2025",
+      "label": "Sub/folder_May_2025",
+      "group": 2,
+      "type": "feature"
+    },
+    {
+      "id": "Sub/folder_April_2024_Pavonas",
+      "label": "Sub/folder_April_2024_Pavonas",
+      "group": 2,
+      "type": "feature"
+    },
+    {
+      "id": "Sub/folder_Feb_March_2024_Pavonas",
+      "label": "Sub/folder_Feb_March_2024_Pavonas",
+      "group": 2,
+      "type": "feature"
+    },
+    {
+      "id": "Site_Plataforma Pavonas, Islas Marietas National Park",
+      "label": "Site_Plataforma Pavonas, Islas Marietas National Park",
+      "group": 3,
+      "type": "feature"
+    },
+    {
+      "id": "Site_Caleta de Cuastecomates",
+      "label": "Site_Caleta de Cuastecomates",
+      "group": 3,
+      "type": "feature"
+    },
+    {
+      "id": "Month of recording_June",
+      "label": "Month of recording_June",
+      "group": 4,
+      "type": "feature"
+    },
+    {
+      "id": "Month of recording_July ",
+      "label": "Month of recording_July ",
+      "group": 4,
+      "type": "feature"
+    },
+    {
+      "id": "Month of recording_May ",
+      "label": "Month of recording_May ",
+      "group": 4,
+      "type": "feature"
+    },
+    {
+      "id": "Month of recording_April",
+      "label": "Month of recording_April",
+      "group": 4,
+      "type": "feature"
+    },
+    {
+      "id": "Month of recording_February",
+      "label": "Month of recording_February",
+      "group": 4,
+      "type": "feature"
+    },
+    {
+      "id": "Year_2025",
+      "label": "Year_2025",
+      "group": 5,
+      "type": "feature"
+    },
+    {
+      "id": "Year_2024",
+      "label": "Year_2024",
+      "group": 5,
+      "type": "feature"
+    },
+    {
+      "id": "Season_Wet",
+      "label": "Season_Wet",
+      "group": 6,
+      "type": "feature"
+    },
+    {
+      "id": "Season_Dry",
+      "label": "Season_Dry",
+      "group": 6,
+      "type": "feature"
+    },
+    {
+      "id": "Location_20\u00a142'05\"N 105\u00a133'54\"W",
+      "label": "Location_20\u00a142'05\"N 105\u00a133'54\"W",
+      "group": 7,
+      "type": "feature"
+    },
+    {
+      "id": "Location_19\u00a113'52\"N 104\u00a145'20\"W",
+      "label": "Location_19\u00a113'52\"N 104\u00a145'20\"W",
+      "group": 7,
+      "type": "feature"
+    },
+    {
+      "id": "Country_Mexico",
+      "label": "Country_Mexico",
+      "group": 8,
+      "type": "feature"
+    },
+    {
+      "id": "Recording schedule_04:00:00 -  23:00 hrs",
+      "label": "Recording schedule_04:00:00 -  23:00 hrs",
+      "group": 9,
+      "type": "feature"
+    },
+    {
+      "id": "Frequency (kHz)_96",
+      "label": "Frequency (kHz)_96",
+      "group": 10,
+      "type": "feature"
+    },
+    {
+      "id": "Depth (m)_8",
+      "label": "Depth (m)_8",
+      "group": 11,
+      "type": "feature"
+    },
+    {
+      "id": "Depth (m)_7",
+      "label": "Depth (m)_7",
+      "group": 11,
+      "type": "feature"
+    },
+    {
+      "id": "Human activity_Divers",
+      "label": "Human activity_Divers",
+      "group": 12,
+      "type": "feature"
+    },
+    {
+      "id": "Human activity_Snorkelers",
+      "label": "Human activity_Snorkelers",
+      "group": 12,
+      "type": "feature"
+    },
+    {
+      "id": "Human activity_Fishermen",
+      "label": "Human activity_Fishermen",
+      "group": 12,
+      "type": "feature"
+    },
+    {
+      "id": "Type of boats_< 12 m and 12-24 m",
+      "label": "Type of boats_< 12 m and 12-24 m",
+      "group": 13,
+      "type": "feature"
+    },
+    {
+      "id": "Type of boats_< 12 m",
+      "label": "Type of boats_< 12 m",
+      "group": 13,
+      "type": "feature"
+    },
+    {
+      "id": "EGCI_low",
+      "label": "EGCI_low",
+      "group": 15,
+      "type": "feature"
+    },
+    {
+      "id": "EGCI_medium",
+      "label": "EGCI_medium",
+      "group": 15,
+      "type": "feature"
+    },
+    {
+      "id": "EGCI_Other",
+      "label": "EGCI_Other",
+      "group": 15,
+      "type": "feature"
+    },
+    {
+      "id": "sample_models/dim_10_muha.pt_embeddings_clusters_1",
+      "label": "sample_models/dim_10_muha.pt_embeddings_clusters_1",
+      "group": 16,
+      "type": "feature"
+    },
+    {
+      "id": "sample_models/dim_10_muha.pt_embeddings_clusters_0",
+      "label": "sample_models/dim_10_muha.pt_embeddings_clusters_0",
+      "group": 16,
+      "type": "feature"
+    }
+  ],
+  "links": [
+    {
+      "source": "group::0",
+      "target": "Folder_Degraded_Reef",
+      "weight": 0.6990322876282191
+    },
+    {
+      "source": "group::0",
+      "target": "Folder_Non_Degraded_Reef",
+      "weight": 0.6825340091590189
+    },
+    {
+      "source": "group::0",
+      "target": "Sub/folder_Pavonas_June2025",
+      "weight": 1.3379335932860308
+    },
+    {
+      "source": "group::0",
+      "target": "Sub/folder_July_2024",
+      "weight": 1.4040700703070503
+    },
+    {
+      "source": "group::0",
+      "target": "Sub/folder_May_2025",
+      "weight": 1.3385136948637626
+    },
+    {
+      "source": "group::0",
+      "target": "Sub/folder_April_2024_Pavonas",
+      "weight": 1.924327206527084
+    },
+    {
+      "source": "group::0",
+      "target": "Sub/folder_Feb_March_2024_Pavonas",
+      "weight": 2.3638324338947716
+    },
+    {
+      "source": "group::0",
+      "target": "Site_Plataforma Pavonas, Islas Marietas National Park",
+      "weight": 0.6990322876282191
+    },
+    {
+      "source": "group::0",
+      "target": "Site_Caleta de Cuastecomates",
+      "weight": 0.6825340091590189
+    },
+    {
+      "source": "group::0",
+      "target": "Month of recording_June",
+      "weight": 1.3379335932860308
+    },
+    {
+      "source": "group::0",
+      "target": "Month of recording_July ",
+      "weight": 1.4040700703070503
+    },
+    {
+      "source": "group::0",
+      "target": "Month of recording_May ",
+      "weight": 1.3385136948637626
+    },
+    {
+      "source": "group::0",
+      "target": "Month of recording_April",
+      "weight": 1.924327206527084
+    },
+    {
+      "source": "group::0",
+      "target": "Month of recording_February",
+      "weight": 2.3638324338947716
+    },
+    {
+      "source": "group::0",
+      "target": "Year_2025",
+      "weight": 0.6500985958618539
+    },
+    {
+      "source": "group::0",
+      "target": "Year_2024",
+      "weight": 0.7331354484235472
+    },
+    {
+      "source": "group::0",
+      "target": "Season_Wet",
+      "weight": 0.6824764462409637
+    },
+    {
+      "source": "group::0",
+      "target": "Season_Dry",
+      "weight": 0.6991025107159518
+    },
+    {
+      "source": "group::0",
+      "target": "Location_20\u00a142'05\"N 105\u00a133'54\"W",
+      "weight": 0.6990322876282191
+    },
+    {
+      "source": "group::0",
+      "target": "Location_19\u00a113'52\"N 104\u00a145'20\"W",
+      "weight": 0.6825340091590189
+    },
+    {
+      "source": "group::0",
+      "target": "Depth (m)_8",
+      "weight": 0.6990322876282191
+    },
+    {
+      "source": "group::0",
+      "target": "Depth (m)_7",
+      "weight": 0.6825340091590189
+    },
+    {
+      "source": "group::0",
+      "target": "Human activity_Divers",
+      "weight": 0.6990322876282191
+    },
+    {
+      "source": "group::0",
+      "target": "Human activity_Snorkelers",
+      "weight": 0.6990322876282191
+    },
+    {
+      "source": "group::0",
+      "target": "Human activity_Fishermen",
+      "weight": 0.6825340091590189
+    },
+    {
+      "source": "group::0",
+      "target": "Type of boats_< 12 m and 12-24 m",
+      "weight": 0.6990322876282191
+    },
+    {
+      "source": "group::0",
+      "target": "Type of boats_< 12 m",
+      "weight": 0.6825340091590189
+    },
+    {
+      "source": "group::0",
+      "target": "EGCI_medium",
+      "weight": 3.805658227866518
+    },
+    {
+      "source": "group::0",
+      "target": "EGCI_Other",
+      "weight": 2.741360044772908
+    },
+    {
+      "source": "group::0",
+      "target": "sample_models/dim_10_muha.pt_embeddings_clusters_1",
+      "weight": 0.30365215622130054
+    },
+    {
+      "source": "group::0",
+      "target": "sample_models/dim_10_muha.pt_embeddings_clusters_0",
+      "weight": 1.2622208518859022
+    },
+    {
+      "source": "EGCI_Other",
+      "target": "EGCI_medium",
+      "weight": 2.845276202709421
+    },
+    {
+      "source": "Month of recording_February",
+      "target": "Sub/folder_Feb_March_2024_Pavonas",
+      "weight": 0.12699326762574722
+    }
+  ]
+}
