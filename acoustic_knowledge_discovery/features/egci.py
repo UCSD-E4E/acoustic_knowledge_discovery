@@ -7,37 +7,73 @@ from statsmodels.tsa.stattools import acf
 import librosa
 import os
 
-def Entropy(p1: np.ndarray) -> np.ndarray:
+# def Entropy(p1: np.ndarray) -> np.ndarray:
+#     """
+#     From Colonna et. al., calculates von Neumann Entropy using SciPy's
+#     Shannon's Entropy implementation
+#     """
+#     p1 = p1/np.sum(p1)
+#     return entropy(p1)/np.log(len(p1))
+def Entropy(p1: np.ndarray) -> float:
     """
     From Colonna et. al., calculates von Neumann Entropy using SciPy's
     Shannon's Entropy implementation
     """
-    p1 = p1/np.sum(p1)
-    return entropy(p1)/np.log(len(p1))
+    p1 = np.asarray(p1, dtype=np.float64)
+    s = p1.sum()
+    if s <= 0 or not np.isfinite(s) or len(p1) == 0:
+        return float("nan")
+    p1 = p1 / s
+    return float(entropy(p1) / np.log(len(p1)))
 
 def JSD(p: np.ndarray, q=None) -> tuple[float]:
     """
     Calculates Jensen-Shannon Divergence
     """
     
-    n = len(p)
+    # n = len(p)
+    # if q is None:
+    #     q = np.ones(n)/n # Uniform reference
+    # elif type(q) is not np.ndarray:
+    #     raise "Bad type for equilibrium distributions"
+    # elif len(q) != n:
+    #     raise "Distributions are not the same size"
+    # else:
+    #     q = q/q.sum() # normalize q
+    
+    # p = np.asarray(p)
+    # q = np.asarray(q)
+    # p = p/p.sum() # normalize
+    # m = (p + q) / 2
+    
+    # jensen0 = -2*((((n+1)/n)*np.log(n+1)-2*np.log(2*n) + np.log(n))**(-1))
+    
+    # return jensen0*(entropy(p, m) + entropy(q, m)) / 2
+    p = np.asarray(p, dtype=np.float64)
+    n = p.size
+    if n == 0 or not np.isfinite(p).all():
+        return float("nan")
+
+    psum = p.sum()
+    if psum <= 0:
+        return float("nan")
+    p = p / psum
+
     if q is None:
-        q = np.ones(n)/n # Uniform reference
-    elif type(q) is not np.ndarray:
-        raise "Bad type for equilibrium distributions"
-    elif len(q) != n:
-        raise "Distributions are not the same size"
+        q = np.ones(n, dtype=np.float64) / n
     else:
-        q = q/q.sum() # normalize q
-    
-    p = np.asarray(p)
-    q = np.asarray(q)
-    p = p/p.sum() # normalize
+        q = np.asarray(q, dtype=np.float64)
+        if q.size != n:
+            raise ValueError("Distributions are not the same size")
+        qsum = q.sum()
+        if qsum <= 0 or not np.isfinite(q).all():
+            return float("nan")
+        q = q / qsum
+
     m = (p + q) / 2
-    
-    jensen0 = -2*((((n+1)/n)*np.log(n+1)-2*np.log(2*n) + np.log(n))**(-1))
-    
-    return jensen0*(entropy(p, m) + entropy(q, m)) / 2
+
+    jensen0 = -2 * (((((n + 1) / n) * np.log(n + 1) - 2 * np.log(2 * n) + np.log(n)) ** (-1)))
+    return float(jensen0 * (entropy(p, m) + entropy(q, m)) / 2)
 
 # https://github.com/juancolonna/EGCI/blob/master/Example_of_EGCI_calculation.ipynb
     
@@ -64,25 +100,41 @@ def process_batch(batch, lag, chunk_size=5):
 
     for path, start in zip(batch["file_path"], batch["chunk_start"]):
         # Load exactly the needed window, keep original sr
-        y, _ = librosa.load(
-            os.fspath(path),
-            offset=float(start),
-            duration=float(chunk_size),
-            sr=None
-        )
+        try:
+            y, _ = librosa.load(
+                os.fspath(path),
+                offset=float(start),
+                duration=float(chunk_size),
+                sr=None
+            )
+            if y is None or len(y) < (lag + 2):
+                raise ValueError("audio chunk too short for chosen lag")
 
-        x = zscore(y.astype(np.float32), ddof=0)
-        # Algorithm steps 
-        rxx = acf(x, nlags=lag, adjusted=True, fft=True)
+            #x = zscore(y.astype(np.float32), ddof=0)
+            x = zscore(y.astype(np.float64), ddof=0)
+            if not np.isfinite(x).all():
+                raise ValueError("x has NaN/Inf (likely silent/constant audio)")
+            # Algorithm steps 
+            rxx = acf(x, nlags=lag, adjusted=True, fft=True)
+            if not np.isfinite(rxx).all():
+                raise ValueError("rxx has NaN/Inf")
 
-        #https://github.com/blue-yonder/tsfresh/issues/902
-        Sxx = toeplitz(rxx)
-        s = np.linalg.svd(Sxx, compute_uv=False)
 
-        entropy = Entropy(s)
-        complexity = entropy * JSD(s)
+            #https://github.com/blue-yonder/tsfresh/issues/902
+            Sxx = toeplitz(rxx).astype(np.float64, copy=False)
+            if not np.isfinite(Sxx).all():
+                raise ValueError("Sxx has NaN/Inf")
+            s = np.linalg.svd(Sxx, compute_uv=False)
+            if not np.isfinite(s).all() or s.sum() <= 0:
+                raise ValueError("Bad singular values")
 
-        egci_batch.append([float(entropy), float(complexity)])
+            entropy = Entropy(s)
+            complexity = entropy * JSD(s)
+
+            egci_batch.append([float(entropy), float(complexity)])
+        except Exception as e:
+            print(f"Error processing file {path} at start {start}: {e}")
+            egci_batch.append([float("nan"), float("nan")])
 
     return {"EGCI": egci_batch}
 
