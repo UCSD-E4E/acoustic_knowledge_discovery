@@ -6,3 +6,4 @@ from .egci import EGCI
 from .autoencode import AutoEncoderProcessor
 from .Volume import Volume
 from .tempo import TemporalPattern
+from .recommender_prune import recommender_prune
